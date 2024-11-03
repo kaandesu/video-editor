@@ -1,4 +1,5 @@
 #include "raylib.h"
+#include <stdbool.h>
 
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
@@ -20,12 +21,23 @@
 
 FILE *videoFile;
 int frameCount, lastFrame = 0;
+bool paused = false;
 
 void restartVideo();
 
 int main(void) {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "kaandesu video editor");
   SetTargetFPS(60);
+
+  Rectangle ScrollPanel000ScrollView = {0, 0, 0, 0};
+  Vector2 ScrollOffset = {0, 0};
+  Vector2 ScrollBoundsOffset = {0, 0};
+  Color colorPickerVal = {255, 255, 255, 255};
+  bool spinnerEditMode = false;
+  int spinnerVal = 0;
+  bool button4Pressed = false;
+  bool restartBtnPressed = false;
+  bool button7Pressed = false;
 
   mpeg2dec_t *decoder = mpeg2_init();
   if (!decoder) {
@@ -45,15 +57,23 @@ int main(void) {
   Texture texture = {0};
   uint8_t buffer[BUFFER_SIZE];
   bool gotDims = false;
+  bool loop = false;
 
   while (!WindowShouldClose()) {
     lastFrame = frameCount;
-    while (lastFrame == frameCount) {
+    while (lastFrame == frameCount && !paused) {
       state = mpeg2_parse(decoder);
       switch (state) {
       case STATE_BUFFER:
         size = fread(buffer, 1, BUFFER_SIZE, videoFile);
         mpeg2_buffer(decoder, buffer, buffer + BUFFER_SIZE);
+        if (size == 0) {
+          if (loop == true) {
+            restartVideo();
+          } else {
+            paused = true;
+          }
+        }
         break;
       case STATE_SEQUENCE:
         mpeg2_convert(decoder, mpeg2convert_rgb24, NULL);
@@ -88,16 +108,32 @@ int main(void) {
     }
 
     BeginDrawing();
-    ClearBackground(DARKGRAY);
-    if (GuiButton((Rectangle){100, 150 - 15, 120, 30}, "#58# Restart")) {
+    ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
+
+    GuiScrollPanel((Rectangle){320, 520, 616 - ScrollBoundsOffset.x,
+                               168 - ScrollBoundsOffset.y},
+                   NULL, (Rectangle){320, 520, 616, 168}, &ScrollOffset,
+                   &ScrollPanel000ScrollView);
+    GuiPanel((Rectangle){304, 80, 456, 344}, NULL);
+    GuiColorPicker((Rectangle){792, 88, 96, 96}, NULL, &colorPickerVal);
+    GuiSpinner((Rectangle){328, 448, 136, 32}, "Current Frame", &frameCount, 0,
+               100, true);
+    button4Pressed = GuiButton((Rectangle){520, 448, 144, 32}, "Upload");
+    GuiLine((Rectangle){792, 200, 120, 16}, NULL);
+    restartBtnPressed =
+        GuiButton((Rectangle){792, 232, 120, 24}, "#58# Restart");
+    button7Pressed = GuiButton((Rectangle){792, 272, 120, 24}, "Save");
+
+    if (restartBtnPressed) {
       restartVideo();
     }
 
     DrawFPS(10, 10);
-    DrawTexturePro(
-        texture, (Rectangle){0, 0, texture.width, texture.width},
-        (Rectangle){(GetScreenWidth() / 2.0f) - 400.0f / 2, 0, 400, 300},
-        (Vector2){0, 0}, 0, WHITE);
+    Color newCol =
+        (Color){colorPickerVal.r, colorPickerVal.g, colorPickerVal.b, 255};
+    DrawTexturePro(texture, (Rectangle){0, 0, texture.width, texture.width},
+                   (Rectangle){332.0f, 100, 400, 300}, (Vector2){0, 0}, 0,
+                   newCol);
     EndDrawing();
   }
 
@@ -109,5 +145,6 @@ int main(void) {
 
 void restartVideo() {
   rewind(videoFile);
+  paused = false;
   frameCount = 0;
 }
