@@ -13,7 +13,7 @@ pkg_check_modules(MPEGS REQUIRED libmpeg2)
 include_directories(${RAYLIB_DIR}/include  ${HOMEBREW_DIR} ${CYBER_STYLE_DIR})
 link_directories(${MPEGS_LIBRARY_DIRS})
 
-add_executable(video_editor src/main.c)
+add_executable(video_editor src/main.c src/video.c src/gui.c src/input.c)
 
 if(APPLE)
     target_link_libraries(video_editor 
