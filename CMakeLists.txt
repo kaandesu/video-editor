@@ -13,10 +13,10 @@ pkg_check_modules(MPEGS REQUIRED libmpeg2)
 include_directories(${RAYLIB_DIR}/include  ${HOMEBREW_DIR} ${CYBER_STYLE_DIR})
 link_directories(${MPEGS_LIBRARY_DIRS})
 
-add_executable(my_program src/main.c)
+add_executable(video_editor src/main.c)
 
 if(APPLE)
-    target_link_libraries(my_program 
+    target_link_libraries(video_editor 
         "${RAYLIB_DIR}/libraylib.a" 
         ${MPEGS_LIBRARIES}
         "-lmpeg2convert"
@@ -27,6 +27,10 @@ if(APPLE)
         ${CMAKE_DL_LIBS} # Dynamically linked libraries (if needed)
     )
 else()
-    # Linux specific settings (if applicable)
-    target_link_libraries(my_program "${RAYLIB_DIR}/libraylib.a")
+    target_link_libraries(video_editor
+      "${RAYLIB_DIR}/libraylib.a"
+      ${MPEGS_LIBRARIES}
+      "-lmpeg2convert"
+      ${CMAKE_DL_LIBS} # Dynamically linked libraries (if needed)
+    )
 endif()

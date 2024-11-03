@@ -1,4 +1,4 @@
-PROJECT_NAME = my_program
+PROJECT_NAME = video_editor
 BUILD_DIR = build
 
 all: clean build run

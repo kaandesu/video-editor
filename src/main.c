@@ -30,7 +30,10 @@ void restartVideo();
 int main(void) {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "kaandesu video editor");
   GuiLoadStyleCyber();
+  // WARN: if video fps and targetFps don't match
+  // video will not play in its  intended speed
   SetTargetFPS(60);
+  SetExitKey(0);
 
   Rectangle ScrollPanel000ScrollView = {0, 0, 0, 0};
   Vector2 ScrollOffset = {0, 0};
