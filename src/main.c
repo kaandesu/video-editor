@@ -1,8 +1,10 @@
 #include "raylib.h"
-#include <stdbool.h>
 
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
+#include "style_cyber.h"
+
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,6 +29,7 @@ void restartVideo();
 
 int main(void) {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "kaandesu video editor");
+  GuiLoadStyleCyber();
   SetTargetFPS(60);
 
   Rectangle ScrollPanel000ScrollView = {0, 0, 0, 0};
@@ -116,8 +119,10 @@ int main(void) {
                    &ScrollPanel000ScrollView);
     GuiPanel((Rectangle){304, 80, 456, 344}, NULL);
     GuiColorPicker((Rectangle){792, 88, 96, 96}, NULL, &colorPickerVal);
-    GuiSpinner((Rectangle){328, 448, 136, 32}, "Current Frame", &frameCount, 0,
-               100, true);
+    char frameCountLabel[50];
+    snprintf(frameCountLabel, 50, "Frame count: %d\n", frameCount);
+    GuiLabel((Rectangle){328, 448, 136, 32}, frameCountLabel);
+
     button4Pressed = GuiButton((Rectangle){520, 448, 144, 32}, "Upload");
     GuiLine((Rectangle){792, 200, 120, 16}, NULL);
     restartBtnPressed =
