@@ -38,11 +38,11 @@ FileDialog *LoadFileDialog(Rectangle rect, char *label, char *wTitle,
   snprintf(fd->label, sizeof(fd->label), "%s", label);
 
   fd->dragField = (DragField *)malloc(sizeof(DragField));
-
   if (fd->dragField == NULL) {
     TraceLog(LOG_ERROR, "error while allocating the dragField");
     exit(EXIT_FAILURE);
   }
+
   fd->dragField->active = false;
   fd->dragField->anchor = pos;
 
@@ -62,39 +62,29 @@ void DrawFileDialog(FileDialog *fd) {
     df->active = true;
   }
 
+  Rectangle dfRect = (Rectangle){df->anchor.x + 0, df->anchor.y + 0, 288, 208};
+
   if (df->active) {
-    df->active = !GuiWindowBox(
-        (Rectangle){df->anchor.x + 0, df->anchor.y + 0, 288, 208}, df->title);
+    df->active = !GuiWindowBox(dfRect, df->title);
 
     GuiLabel((Rectangle){df->anchor.x + 72, df->anchor.y + 96, 152, 24},
              df->desc);
 
-    if (CheckCollisionPointRec(
-            GetMousePosition(),
-            (Rectangle){df->anchor.x + 0, df->anchor.y + 0, 288, 208})) {
-      if (!fd->hovered) {
+    if (CheckCollisionPointRec(GetMousePosition(), dfRect)) {
+      if (!fd->hovered)
         fd->hovered = true;
-        TraceLog(LOG_WARNING, "hovered on the thing");
-      }
-    } else {
-
-      if (fd->hovered) {
-
-        fd->hovered = false;
-        TraceLog(LOG_WARNING, "unhovered on the thing");
-      }
+    } else if (fd->hovered) {
+      fd->hovered = false;
     }
   }
 
   if (IsFileDropped()) {
     if (!fd->hovered || !fd->dragField->active) {
-      TraceLog(LOG_WARNING, "'unloading' the dropped files");
-      char **tempList = malloc(sizeof(char *));
-      tempList[0] = malloc(1);
-      FilePathList tempFileList = {.count = 1, .paths = tempList};
+      TraceLog(LOG_WARNING, "ignoring the dropped files");
+      FilePathList tempFileList = {.count = 1, .paths = malloc(1)};
       UnloadDroppedFiles(tempFileList);
     } else {
-      TraceLog(LOG_WARNING, "loading the dropped files");
+      TraceLog(LOG_INFO, "loading the dropped files");
       fd->fileList = LoadDroppedFiles();
       if (fd->fileList.count == 1) {
         // TODO: check if is an .mpg file
@@ -106,4 +96,8 @@ void DrawFileDialog(FileDialog *fd) {
   }
 }
 
-void UnloadFileDialog(FileDialog *fd) { UnloadDroppedFiles(fd->fileList); }
+void UnloadFileDialog(FileDialog *fd) {
+  free(fd->dragField);
+  free(fd);
+  UnloadDroppedFiles(fd->fileList);
+}

@@ -5,5 +5,6 @@ void initGui(void);
 void drawGui(void);
 void drawGuiElements(void);
 void setupGui(void);
+void UnloadGui(void);
 
 #endif

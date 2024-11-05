@@ -39,6 +39,7 @@ int main(void) {
   }
 
   UnloadVideo();
+  UnloadGui();
   CloseWindow();
   return EXIT_SUCCESS;
 }

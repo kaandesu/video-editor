@@ -47,3 +47,5 @@ static void inputGui() {
     // open ffmpeg listening stdin
   }
 }
+
+void UnloadGui() { UnloadFileDialog(fileImport); }
