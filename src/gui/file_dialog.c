@@ -87,7 +87,7 @@ void DrawFileDialog(FileDialog *fd) {
   }
 
   if (IsFileDropped()) {
-    if (!fd->hovered) {
+    if (!fd->hovered || !fd->dragField->active) {
       TraceLog(LOG_WARNING, "'unloading' the dropped files");
       char **tempList = malloc(sizeof(char *));
       tempList[0] = malloc(1);
