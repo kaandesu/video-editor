@@ -14,15 +14,15 @@ static bool saveButton = false;
 
 static FileDialog *fileImport;
 
-static void inputGui();
+static void GuiInput();
 
-void setupGui(void) {
+void GuiSetup(void) {
   fileImport = LoadFileDialog((Rectangle){100, 100, 150, 24}, "Import File",
                               "IMPORT VIDEO", "DRAG & DROP THE VIDEO",
                               (Vector2){440, 200});
 }
 
-void drawGui(void) {
+void DrawGui(void) {
   char frameCountLabel[50];
   snprintf(frameCountLabel, 50, "Frame count: %d\n", getCurrentFrameCount());
   GuiLabel((Rectangle){328, 448, 136, 32}, frameCountLabel);
@@ -33,15 +33,15 @@ void drawGui(void) {
   saveButton = GuiButton((Rectangle){792, 272, 120, 24}, "Save");
 
   DrawFileDialog(fileImport);
-  inputGui();
+  GuiInput();
 }
 
-static void inputGui() {
+static void GuiInput() {
   if (restartButton) {
-    restartVideo();
+    RestartVideo();
   }
   if (saveButton) {
-    restartVideo();
+    RestartVideo();
     // open a dialog, select sthe start and end
     // jump to framecount and wait until the duration * fps
     // open ffmpeg listening stdin

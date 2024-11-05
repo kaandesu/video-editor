@@ -8,9 +8,9 @@ void RenderVideo(void);
 void DrawVideo(void);
 void renderVideo(void);
 void UnloadVideo(void);
-void restartVideo(void);
+void RestartVideo(void);
 int getCurrentFrameCount(void);
-char *getFilePath(void);
-void updateFilePath(const char *filename);
+char *GetFilePath(void);
+void UpdateFilePath(const char *filename);
 
 #endif

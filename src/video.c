@@ -32,7 +32,7 @@ static uint8_t buffer[BUFFER_SIZE];
 static size_t size;
 
 void LoadVideo(const char *filename) {
-  updateFilePath(filename);
+  UpdateFilePath(filename);
   decoder = mpeg2_init();
   if (!decoder) {
     TraceLog(LOG_ERROR, "Failed to init the decoder.");
@@ -61,7 +61,7 @@ void RenderVideo(void) {
       mpeg2_buffer(decoder, buffer, buffer + BUFFER_SIZE);
       if (size == 0) {
         if (loop == true) {
-          restartVideo();
+          RestartVideo();
         } else {
           paused = true;
         }
@@ -135,14 +135,14 @@ void UnloadVideo(void) {
   }
 }
 
-void restartVideo(void) {
+void RestartVideo(void) {
   rewind(videoFile);
   frameCount = 0;
   paused = false;
 }
 
-char *getFilePath() { return filePath; }
-void updateFilePath(const char *filename) {
+char *GetFilePath() { return filePath; }
+void UpdateFilePath(const char *filename) {
   if (filePath != NULL) {
     free(filePath);
   }
@@ -153,7 +153,7 @@ void updateFilePath(const char *filename) {
   if (filePath != NULL) {
     snprintf(filePath, length, "%s", filename);
   } else {
-    TraceLog(LOG_ERROR, "Memory allocation failed\n");
+    TraceLog(LOG_ERROR, "Memory allocation failed [UpdateFilePath]\n");
     exit(EXIT_FAILURE);
   }
 }

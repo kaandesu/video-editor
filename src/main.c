@@ -22,8 +22,6 @@ int main(void) {
   SetTargetFPS(60);
   SetExitKey(KEY_ESCAPE);
 
-  // LoadVideo();
-
   setupGui();
   while (!WindowShouldClose()) {
     listenInput();
