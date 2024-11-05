@@ -1,10 +1,12 @@
 #include "file_dialog.h"
 #include "raygui.h"
 #include "raylib.h"
+#include "video.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <unistd.h>
 
 typedef struct DragField {
@@ -25,10 +27,20 @@ typedef struct file_dialog {
 FileDialog *LoadFileDialog(Rectangle rect, char *label, char *wTitle,
                            char *wDesc, Vector2 pos) {
   FileDialog *fd = (FileDialog *)malloc(sizeof(FileDialog));
+  if (fd == NULL) {
+    TraceLog(LOG_ERROR, "could not allocate file dialog");
+    exit(EXIT_FAILURE);
+  }
+
   fd->rectangle = rect;
   snprintf(fd->label, sizeof(fd->label), "%s", label);
 
   fd->dragField = (DragField *)malloc(sizeof(DragField));
+
+  if (fd->dragField == NULL) {
+    TraceLog(LOG_ERROR, "error while allocating the dragField");
+    exit(EXIT_FAILURE);
+  }
   fd->dragField->active = false;
   fd->dragField->anchor = pos;
 
@@ -61,6 +73,13 @@ void DrawFileDialog(FileDialog *fd) {
           (Rectangle){df->anchor.x + 0, df->anchor.y + 0, 288, 208})) {
     if (IsFileDropped()) {
       fd->fileList = LoadDroppedFiles();
+      if (fd->fileList.count == 1) {
+        // TODO: check if is an .mpg file
+        LoadVideo(fd->fileList.paths[0]);
+        df->active = false;
+      } else {
+        // TODO: create toast message here
+      }
     }
   }
 }

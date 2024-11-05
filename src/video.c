@@ -1,9 +1,12 @@
 #include "video.h"
 #include "raygui.h"
 #include "raylib.h"
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <time.h>
 #include <unistd.h>
 
 #include <mpeg2dec/mpeg2.h>
@@ -11,6 +14,9 @@
 
 #define BUFFER_SIZE 4096
 
+// TODO: make the below a struct as video_player
+char *filePath;
+bool videoLoaded = false;
 static FILE *videoFile;
 static mpeg2dec_t *decoder;
 static Image img = {0};
@@ -25,25 +31,27 @@ static bool loop = false;
 static uint8_t buffer[BUFFER_SIZE];
 static size_t size;
 
-bool initVideo(const char *filename) {
+void LoadVideo(const char *filename) {
+  updateFilePath(filename);
   decoder = mpeg2_init();
   if (!decoder) {
     TraceLog(LOG_ERROR, "Failed to init the decoder.");
-    return false;
+    exit(EXIT_FAILURE);
   }
 
-  videoFile = fopen(filename, "rb");
+  videoFile = fopen(filePath, "rb");
   if (!videoFile) {
     TraceLog(LOG_ERROR, "Failed to open the video file.");
-    return false;
+    exit(EXIT_FAILURE);
   }
 
   info = mpeg2_info(decoder);
-
-  return true;
+  videoLoaded = true;
 }
 
-void updateVideo(void) {
+void RenderVideo(void) {
+  if (!videoLoaded)
+    return;
   lastFrame = frameCount;
   while (lastFrame == frameCount && !paused) {
     state = mpeg2_parse(decoder);
@@ -108,21 +116,44 @@ void renderVideo(void) {
   EndTextureMode();
 }
 
-void drawVideo(void) {
+void DrawVideo(void) {
+  if (!videoLoaded)
+    return;
   DrawFPS(10, 10);
   GuiPanel((Rectangle){304, 80, 456, 344}, NULL);
   DrawTexturePro(texture, (Rectangle){0, 0, texture.width, texture.width},
                  (Rectangle){332.0f, 100, 400, 300}, (Vector2){0, 0}, 0, WHITE);
 }
 
-void unloadVideo(void) {
+void UnloadVideo(void) {
   UnloadRenderTexture(renderTexture);
-  mpeg2_close(decoder);
-  fclose(videoFile);
+  if (decoder != NULL) {
+    mpeg2_close(decoder);
+  }
+  if (videoFile != NULL) {
+    fclose(videoFile);
+  }
 }
 
 void restartVideo(void) {
   rewind(videoFile);
   frameCount = 0;
   paused = false;
+}
+
+char *getFilePath() { return filePath; }
+void updateFilePath(const char *filename) {
+  if (filePath != NULL) {
+    free(filePath);
+  }
+
+  size_t length = strlen(filename) + 1;
+  filePath = malloc(length);
+
+  if (filePath != NULL) {
+    snprintf(filePath, length, "%s", filename);
+  } else {
+    TraceLog(LOG_ERROR, "Memory allocation failed\n");
+    exit(EXIT_FAILURE);
+  }
 }

@@ -3,12 +3,14 @@
 
 #include <stdbool.h>
 
-bool initVideo(const char *filename);
-void updateVideo(void);
-void drawVideo(void);
+void LoadVideo(const char *filename);
+void RenderVideo(void);
+void DrawVideo(void);
 void renderVideo(void);
-void unloadVideo(void);
+void UnloadVideo(void);
 void restartVideo(void);
 int getCurrentFrameCount(void);
+char *getFilePath(void);
+void updateFilePath(const char *filename);
 
 #endif

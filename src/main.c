@@ -16,30 +16,29 @@
 #define SCREEN_WIDTH 1200
 #define SCREEN_HEIGHT 700
 
-#define VIDEO "resources/test.mpg"
-
 int main(void) {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "kaan's video editor");
   GuiLoadStyleCyber();
   SetTargetFPS(60);
   SetExitKey(KEY_ESCAPE);
 
-  if (!initVideo(VIDEO)) {
-    CloseWindow();
-    return EXIT_FAILURE;
-  }
+  // LoadVideo();
+
   setupGui();
   while (!WindowShouldClose()) {
     listenInput();
-    updateVideo();
+    RenderVideo();
+
     BeginDrawing();
+
     ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
-    drawVideo();
+    DrawVideo();
     drawGui();
+
     EndDrawing();
   }
 
-  unloadVideo();
+  UnloadVideo();
   CloseWindow();
   return EXIT_SUCCESS;
 }
