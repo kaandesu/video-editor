@@ -1,5 +1,6 @@
 build
 .cache
+lib/temp
 .DS_Store
 CMakeCache.txt
 CMakeFiles
