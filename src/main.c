@@ -22,7 +22,7 @@ int main(void) {
   SetTargetFPS(60);
   SetExitKey(KEY_ESCAPE);
 
-  setupGui();
+  GuiSetup();
   while (!WindowShouldClose()) {
     listenInput();
     RenderVideo();
@@ -31,7 +31,7 @@ int main(void) {
 
     ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
     DrawVideo();
-    drawGui();
+    DrawGui();
 
     EndDrawing();
   }

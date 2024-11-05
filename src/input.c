@@ -3,6 +3,6 @@
 
 void listenInput() {
   if (IsKeyDown(KEY_R)) {
-    restartVideo();
+    RestartVideo();
   }
 }

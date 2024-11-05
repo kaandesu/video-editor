@@ -7,14 +7,21 @@ Creating my own basic video-editor in raylib, using ffmpeg and libmpeg2.
 </div>
 
 > [!IMPORTANT]
-> video-editor is currently under development. Gif above is from a 1-2 hours of work,
-> probably doesn't reflect the current progress. Will update on every minor version update.
+> video-editor is currently under development.
+> Gif above probably doesn't reflect the current progress.
+> Will update on every minor version update.
 
 Tasks:
 
 - Layout design with raygui
-- Upload .mpg files [DONE]
+- Upload .mpg files (drag & drop) [DONE]
 - Adding and stiching existing video and decoding with libmpeg2
 - Saving the editor state, so you don't lose progress after restart
 - Saving the final result with ffmpeg
 - Simple manim like animation pipeline through configuration files
+
+#### Why?
+
+¯\_(ツ)\_/¯
+
+I woke up one day and noticed that I can just do that.
