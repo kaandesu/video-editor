@@ -22,7 +22,7 @@ int main(void) {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "kaan's video editor");
   GuiLoadStyleCyber();
   SetTargetFPS(60);
-  SetExitKey(0);
+  SetExitKey(KEY_ESCAPE);
 
   if (!initVideo(VIDEO)) {
     CloseWindow();

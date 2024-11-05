@@ -13,8 +13,9 @@
 
 static FILE *videoFile;
 static mpeg2dec_t *decoder;
-static Texture texture = {0};
 static Image img = {0};
+static RenderTexture2D renderTexture = {0};
+static Texture2D texture = {0};
 static int frameCount, lastFrame = 0;
 static bool paused = false;
 static const mpeg2_info_t *info;
@@ -77,8 +78,19 @@ void updateVideo(void) {
           texture = LoadTextureFromImage(img);
           UnloadImage(img);
         }
+
+        BeginDrawing();
         UpdateTexture(texture, info->display_fbuf->buf[0]);
         frameCount++;
+        BeginTextureMode(renderTexture);
+        DrawTexturePro(texture, (Rectangle){0, 0, texture.width, texture.width},
+                       (Rectangle){332.0f, 100, 400, 300}, (Vector2){0, 0}, 0,
+                       WHITE);
+        EndTextureMode();
+
+        DrawTexturePro(texture, (Rectangle){0, 0, texture.width, texture.width},
+                       (Rectangle){332.0f, 100, 400, 300}, (Vector2){0, 0}, 0,
+                       WHITE);
       }
       break;
     default:
@@ -89,13 +101,21 @@ void updateVideo(void) {
 
 int getCurrentFrameCount() { return frameCount; }
 
-void drawVideo(void) {
+void renderVideo(void) {
+  BeginTextureMode(renderTexture);
   DrawTexturePro(texture, (Rectangle){0, 0, texture.width, texture.width},
-                 (Rectangle){332.0f, 100, 400, 300}, (Vector2){0, 0}, 0,
-                 getColorPickerVal());
+                 (Rectangle){332.0f, 100, 400, 300}, (Vector2){0, 0}, 0, WHITE);
+  EndTextureMode();
+}
+
+void drawVideo(void) {
+  DrawFPS(10, 10);
+  DrawTexturePro(texture, (Rectangle){0, 0, texture.width, texture.width},
+                 (Rectangle){332.0f, 100, 400, 300}, (Vector2){0, 0}, 0, WHITE);
 }
 
 void unloadVideo(void) {
+  UnloadRenderTexture(renderTexture);
   mpeg2_close(decoder);
   fclose(videoFile);
 }

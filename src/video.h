@@ -6,6 +6,7 @@
 bool initVideo(const char *filename);
 void updateVideo(void);
 void drawVideo(void);
+void renderVideo(void);
 void unloadVideo(void);
 void restartVideo(void);
 int getCurrentFrameCount(void);
