@@ -13,7 +13,7 @@ Creating my own basic video-editor in raylib, using ffmpeg and libmpeg2.
 Tasks:
 
 - Layout design with raygui
-- Upload .mpg files
+- Upload .mpg files [DONE]
 - Adding and stiching existing video and decoding with libmpeg2
 - Saving the editor state, so you don't lose progress after restart
 - Saving the final result with ffmpeg
