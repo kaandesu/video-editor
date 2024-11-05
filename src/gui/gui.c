@@ -1,4 +1,5 @@
 #include "gui.h"
+#include "file_dialog.h"
 #include "raygui.h"
 #include "raylib.h"
 #include "video.h"
@@ -11,10 +12,17 @@ static bool uploadButton = false;
 static bool restartButton = false;
 static bool saveButton = false;
 
-static void listenGui();
+static FileDialog *fileImport;
+
+static void inputGui();
+
+void setupGui(void) {
+  fileImport = LoadFileDialog((Rectangle){100, 100, 150, 24}, "Import File",
+                              "IMPORT VIDEO", "DRAG & DROP THE VIDEO",
+                              (Vector2){440, 200});
+}
 
 void drawGui(void) {
-  GuiPanel((Rectangle){304, 80, 456, 344}, NULL);
   char frameCountLabel[50];
   snprintf(frameCountLabel, 50, "Frame count: %d\n", getCurrentFrameCount());
   GuiLabel((Rectangle){328, 448, 136, 32}, frameCountLabel);
@@ -24,10 +32,11 @@ void drawGui(void) {
   restartButton = GuiButton((Rectangle){792, 232, 120, 24}, "#58# Restart");
   saveButton = GuiButton((Rectangle){792, 272, 120, 24}, "Save");
 
-  listenGui();
+  DrawFileDialog(fileImport);
+  inputGui();
 }
 
-static void listenGui() {
+static void inputGui() {
   if (restartButton) {
     restartVideo();
   }

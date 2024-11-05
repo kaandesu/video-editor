@@ -1,5 +1,5 @@
 #include "video.h"
-#include "gui.h"
+#include "raygui.h"
 #include "raylib.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -110,6 +110,7 @@ void renderVideo(void) {
 
 void drawVideo(void) {
   DrawFPS(10, 10);
+  GuiPanel((Rectangle){304, 80, 456, 344}, NULL);
   DrawTexturePro(texture, (Rectangle){0, 0, texture.width, texture.width},
                  (Rectangle){332.0f, 100, 400, 300}, (Vector2){0, 0}, 0, WHITE);
 }

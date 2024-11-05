@@ -28,14 +28,14 @@ int main(void) {
     CloseWindow();
     return EXIT_FAILURE;
   }
-
+  setupGui();
   while (!WindowShouldClose()) {
     listenInput();
     updateVideo();
     BeginDrawing();
     ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
-    drawGui();
     drawVideo();
+    drawGui();
     EndDrawing();
   }
 
