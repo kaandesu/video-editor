@@ -62,12 +62,12 @@ void DrawFileDialog(FileDialog *fd) {
     df->active = true;
   }
 
-  Rectangle dfRect = (Rectangle){df->anchor.x + 0, df->anchor.y + 0, 288, 208};
+  Rectangle dfRect = (Rectangle){df->anchor.x + 0, df->anchor.y + 0, 248, 296};
 
   if (df->active) {
     df->active = !GuiWindowBox(dfRect, df->title);
 
-    GuiLabel((Rectangle){df->anchor.x + 72, df->anchor.y + 96, 152, 24},
+    GuiLabel((Rectangle){df->anchor.x + 50, df->anchor.y + 140, 152, 24},
              df->desc);
 
     if (CheckCollisionPointRec(GetMousePosition(), dfRect)) {

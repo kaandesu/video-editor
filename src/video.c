@@ -95,10 +95,6 @@ void RenderVideo(void) {
                        (Rectangle){332.0f, 100, 400, 300}, (Vector2){0, 0}, 0,
                        WHITE);
         EndTextureMode();
-
-        DrawTexturePro(texture, (Rectangle){0, 0, texture.width, texture.width},
-                       (Rectangle){332.0f, 100, 400, 300}, (Vector2){0, 0}, 0,
-                       WHITE);
       }
       break;
     default:
@@ -112,17 +108,15 @@ int getCurrentFrameCount() { return frameCount; }
 void renderVideo(void) {
   BeginTextureMode(renderTexture);
   DrawTexturePro(texture, (Rectangle){0, 0, texture.width, texture.width},
-                 (Rectangle){332.0f, 100, 400, 300}, (Vector2){0, 0}, 0, WHITE);
+                 (Rectangle){332.0f, 100, 300, 200}, (Vector2){0, 0}, 0, WHITE);
   EndTextureMode();
 }
 
 void DrawVideo(void) {
   if (!videoLoaded)
     return;
-  DrawFPS(10, 10);
-  GuiPanel((Rectangle){304, 80, 456, 344}, NULL);
   DrawTexturePro(texture, (Rectangle){0, 0, texture.width, texture.width},
-                 (Rectangle){332.0f, 100, 400, 300}, (Vector2){0, 0}, 0, WHITE);
+                 (Rectangle){450.0f, 100, 400, 300}, (Vector2){0, 0}, 0, WHITE);
 }
 
 void UnloadVideo(void) {

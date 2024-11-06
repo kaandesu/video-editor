@@ -13,8 +13,8 @@
 
 #include "input.h"
 
-#define SCREEN_WIDTH 1200
-#define SCREEN_HEIGHT 700
+#define SCREEN_WIDTH 1100
+#define SCREEN_HEIGHT 730
 
 int main(void) {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "kaan's video editor");
