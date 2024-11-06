@@ -81,8 +81,7 @@ void DrawFileDialog(FileDialog *fd) {
   if (IsFileDropped()) {
     if (!fd->hovered || !fd->dragField->active) {
       TraceLog(LOG_WARNING, "ignoring the dropped files");
-      FilePathList tempFileList = {.count = 1, .paths = malloc(1)};
-      UnloadDroppedFiles(tempFileList);
+      UnloadDroppedFiles(LoadDroppedFiles());
     } else {
       TraceLog(LOG_INFO, "loading the dropped files");
       fd->fileList = LoadDroppedFiles();
@@ -99,5 +98,4 @@ void DrawFileDialog(FileDialog *fd) {
 void UnloadFileDialog(FileDialog *fd) {
   free(fd->dragField);
   free(fd);
-  UnloadDroppedFiles(fd->fileList);
 }
