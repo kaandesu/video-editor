@@ -96,6 +96,13 @@ void DrawFileDialog(FileDialog *fd) {
 }
 
 void UnloadFileDialog(FileDialog *fd) {
-  free(fd->dragField);
+  if (fd == NULL)
+    return;
+
+  if (fd->dragField != NULL) {
+    free(fd->dragField);
+    fd->dragField = NULL;
+  }
+
   free(fd);
 }
