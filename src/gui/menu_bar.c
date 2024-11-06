@@ -15,8 +15,8 @@ void donateDialogBtn(void) {}
 void infoDialogBtn(void) {}
 
 void DrawMenuBar() {
-  GuiPanel((Rectangle){152, 0, 88, MD + 5}, NULL);
-  GuiPanel((Rectangle){GetScreenWidth() - 83, 0, 88, MD + 5}, NULL);
+  GuiPanel((Rectangle){152, -1, 88, MD + 6}, NULL);
+  GuiPanel((Rectangle){GetScreenWidth() - 83, -1, 88, MD + 6}, NULL);
   GuiLine((Rectangle){0, P_MD + 4, GetScreenWidth(), 0}, "Options");
 
   if (GuiButton((Rectangle){16, P_XXS, SM, SM}, ICON_FILE_ADD))
