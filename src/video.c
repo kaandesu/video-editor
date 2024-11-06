@@ -87,7 +87,6 @@ void RenderVideo(void) {
           UnloadImage(img);
         }
 
-        BeginDrawing();
         UpdateTexture(texture, info->display_fbuf->buf[0]);
         frameCount++;
         BeginTextureMode(renderTexture);

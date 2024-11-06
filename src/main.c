@@ -30,6 +30,7 @@ int main(void) {
     BeginDrawing();
 
     ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
+
     DrawVideo();
     DrawGui();
 

@@ -5,13 +5,13 @@
 #include "raygui.h"
 #include "raylib.h"
 #include "timeline.h"
+#include <stdlib.h>
 
 MediaPoolWindow *mpw;
 void GuiSetup(void) {
-  FileDialog *fileImport = LoadFileDialog(
-      (Rectangle){105, 80, 230, 25}, "Upload Media", "IMPORT VIDEO",
-      "DRAG & DROP THE VIDEO", (Vector2){97, 112});
-
+  FileDialog *fileImport =
+      LoadFileDialog((Rectangle){105, 80, 230, 25}, "Upload Media", NULL,
+                     "DRAG & DROP THE VIDEO", (Vector2){97, 112});
   mpw = LoadMediaPoolWindow(fileImport);
 }
 

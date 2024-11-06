@@ -4,8 +4,9 @@
 
 typedef struct file_dialog FileDialog;
 
-FileDialog *LoadFileDialog(Rectangle rect, char *label, char *windowTitle,
-                           char *windowDesc, Vector2 pos);
+FileDialog *LoadFileDialog(Rectangle rect, const char *label,
+                           const char *windowTitle, char *windowDesc,
+                           Vector2 pos);
 
 void DrawFileDialog(FileDialog *);
 void UnloadFileDialog(FileDialog *);
