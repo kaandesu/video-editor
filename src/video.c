@@ -130,8 +130,10 @@ void UnloadVideo(void) {
 }
 
 void RestartVideo(void) {
-  rewind(videoFile);
   frameCount = 0;
+  if (videoFile == NULL)
+    return;
+  rewind(videoFile);
   paused = false;
 }
 
