@@ -79,6 +79,7 @@ void DrawFileDialog(FileDialog *fd) {
   }
 
   if (IsFileDropped()) {
+    // TODO: handle multiple files
     if (!fd->hovered || !fd->dragField->active) {
       TraceLog(LOG_WARNING, "ignoring the dropped files");
       UnloadDroppedFiles(LoadDroppedFiles());
@@ -86,7 +87,11 @@ void DrawFileDialog(FileDialog *fd) {
       TraceLog(LOG_INFO, "loading the dropped files");
       fd->fileList = LoadDroppedFiles();
       if (fd->fileList.count == 1) {
-        // TODO: check if is an .mpg file
+        if (!IsFileExtension(fd->fileList.paths[0], ".mpg")) {
+          TraceLog(LOG_WARNING, TextFormat("not supported extension: %s",
+                                           fd->fileList.paths[0]));
+          return;
+        }
         LoadVideo(fd->fileList.paths[0]);
         UnloadDroppedFiles(fd->fileList);
         df->active = false;
