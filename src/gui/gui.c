@@ -2,8 +2,12 @@
 #include "file_dialog.h"
 #include "raygui.h"
 #include "raylib.h"
+#include "style.h"
 #include "video.h"
-#include <stdio.h>
+#include <time.h>
+
+/* shared offsets */
+#define X_OFFSET1 376
 
 static float duration = 5.0f;
 
@@ -14,26 +18,28 @@ static FileDialog *fileImport;
 static void GuiInput();
 
 // NEW
-const char *newBtnText = "new";
-const char *loadLayoutBtnText = "load";
-const char *downloadLayoutBtnText = "downl";
-const char *exportVideoBtnText = "exprt";
-const char *undoText = "back";
-const char *redoText = "next";
-const char *donateText = "donate";
-const char *infoText = "info";
-const char *playText = "play";
+const char *newBtnText = "#8#";
+const char *loadLayoutBtnText = "#5#";
+const char *downloadLayoutBtnText = "#6#";
+const char *exportVideoBtnText = "#7#";
+const char *undoText = "#72#";
+const char *redoText = "#73#";
+const char *donateText = "#191#";
+const char *infoText = "#186#";
+const char *playText = "#131#";
+const char *restartText = "#211#";
 const char *mediaLeaderTitle = "Media";
 const char *mediaPlayerLeaderTitle = "Media Player";
-const char *restartText = "restart";
 const char *currentTimeLabel = "00:00:01/00:00:06";
 const char *timelineLeaderTitle = "Timeline";
-const char *hideButtonLabel = "hide";
-const char *setButtonLabel = "set";
+const char *hideButtonLabel = "#44#";
+const char *muteButtonLabel = "#122#";
+const char *setButtonLabel = "#141#";
 
-Rectangle ScrollPanel015ScrollView = {0, 0, 0, 0};
-Vector2 ScrollPanel015ScrollOffset = {0, 0};
-Vector2 ScrollPanel015BoundsOffset = {0, 0};
+Rectangle mediaSourcesAreaScrollView = {0, 0, 0, 0};
+Vector2 mediaSourcesAreaScrollOffset = {0, 0};
+Vector2 mediaSourcesAreaOffset = {0, 0};
+
 Rectangle ScrollPanel019ScrollView = {0, 0, 0, 0};
 Vector2 ScrollPanel019ScrollOffset = {0, 0};
 Vector2 ScrollPanel019BoundsOffset = {0, 0};
@@ -61,59 +67,92 @@ void DrawGui(void) {
   // snprintf(frameCountLabel, 50, "Frame count: %d\n", getCurrentFrameCount());
   // GuiLabel((Rectangle){328, 448, 136, 32}, frameCountLabel);
 
-  // START OF NEW
-  if (GuiButton((Rectangle){16, 16, 24, 24}, newBtnText))
-    newLayout();
-  if (GuiButton((Rectangle){48, 16, 24, 24}, loadLayoutBtnText))
-    loadLayout();
-  if (GuiButton((Rectangle){80, 16, 24, 24}, downloadLayoutBtnText))
-    downloadLayout();
-  if (GuiButton((Rectangle){112, 16, 24, 24}, exportVideoBtnText))
-    exportVideo();
-  if (GuiButton((Rectangle){168, 16, 24, 24}, undoText))
-    undoBtn();
-  if (GuiButton((Rectangle){200, 16, 24, 24}, redoText))
-    redoBtn();
-  if (GuiButton((Rectangle){1064, 16, 24, 24}, donateText))
-    donateDialogBtn();
-  if (GuiButton((Rectangle){1032, 16, 24, 24}, infoText))
-    infoDialogBtn();
-  if (GuiButton((Rectangle){568, 392, 72, 24}, infoText))
-    Button013();
+  /* Top bar */
+  GuiLine((Rectangle){0, P_MD + 4, GetScreenWidth(), 0}, "Options");
+  GuiPanel((Rectangle){152, 0, 88, MD + 5}, NULL);
+  GuiPanel((Rectangle){GetScreenWidth() - 83, 0, 88, MD + 5}, NULL);
 
+  if (GuiButton((Rectangle){16, P_XXS, SM, SM}, newBtnText))
+    newLayout();
+  if (GuiButton((Rectangle){48, P_XXS, SM, SM}, loadLayoutBtnText))
+    loadLayout();
+  if (GuiButton((Rectangle){80, P_XXS, SM, SM}, downloadLayoutBtnText))
+    downloadLayout();
+  if (GuiButton((Rectangle){112, P_XXS, SM, SM}, exportVideoBtnText))
+    exportVideo();
+  if (GuiButton((Rectangle){168, P_XXS, SM, SM}, undoText))
+    undoBtn();
+  if (GuiButton((Rectangle){200, P_XXS, SM, SM}, redoText))
+    redoBtn();
+  if (GuiButton((Rectangle){1032, P_XXS, SM, SM}, donateText))
+    donateDialogBtn();
+  if (GuiButton((Rectangle){1064, P_XXS, SM, SM}, infoText))
+    infoDialogBtn();
+
+  /* End of Top bar */
+
+  /* Media Source Pane  */
   GuiGroupBox((Rectangle){96, 72, 248, 336}, mediaLeaderTitle);
-  GuiScrollPanel((Rectangle){96, 112, 248 - ScrollPanel015BoundsOffset.x,
-                             296 - ScrollPanel015BoundsOffset.y},
-                 "", (Rectangle){0, 0, 0, 0}, &ScrollPanel015ScrollOffset,
-                 &ScrollPanel015ScrollView);
-  GuiGroupBox((Rectangle){376, 72, 544, 360}, mediaPlayerLeaderTitle);
-  if (GuiButton((Rectangle){664, 392, 72, 24}, restartText))
-    RestartVideo();
-  GuiLabel((Rectangle){392, 392, 128, 24}, currentTimeLabel);
-  GuiGroupBox((Rectangle){376, 464, 728, 248}, timelineLeaderTitle);
-  GuiScrollPanel((Rectangle){440, 472, 656 - ScrollPanel019BoundsOffset.x,
-                             232 - ScrollPanel019BoundsOffset.y},
-                 "", (Rectangle){440, 472, 656, 232},
-                 &ScrollPanel019ScrollOffset, &ScrollPanel019ScrollView);
-  if (GuiButton((Rectangle){384, 480, 48, 16}, hideButtonLabel))
-    noop();
-  if (GuiButton((Rectangle){384, 504, 48, 16}, setButtonLabel))
-    noop();
-  if (GuiButton((Rectangle){384, 536, 48, 16}, hideButtonLabel))
-    noop();
-  if (GuiButton((Rectangle){384, 592, 48, 16}, setButtonLabel))
-    noop();
-  if (GuiButton((Rectangle){384, 648, 48, 16}, setButtonLabel))
-    noop();
-  if (GuiButton((Rectangle){384, 560, 48, 16}, hideButtonLabel))
-    noop();
-  if (GuiButton((Rectangle){384, 616, 48, 16}, setButtonLabel))
-    noop();
-  if (GuiButton((Rectangle){384, 672, 48, 16}, hideButtonLabel))
-    noop();
-  // END OF NEW
+  GuiScrollPanel((Rectangle){96, 112, 248 - mediaSourcesAreaOffset.x,
+                             296 - mediaSourcesAreaOffset.y},
+                 NULL, (Rectangle){96, 112, 248, 296},
+                 &mediaSourcesAreaScrollOffset, &mediaSourcesAreaScrollView);
 
   DrawFileDialog(fileImport);
+  /* End of Media Source Pane  */
+
+  GuiGroupBox((Rectangle){X_OFFSET1, 72, 544, 360}, mediaPlayerLeaderTitle);
+  if (GuiButton((Rectangle){600, 392, MD, SM}, playText))
+    RestartVideo();
+  if (GuiButton((Rectangle){664, 392, MD, SM}, restartText))
+    RestartVideo();
+  GuiLabel((Rectangle){392, 392, 128, 24}, currentTimeLabel);
+
+  /* Timeline scrollpanel */
+  GuiGroupBox((Rectangle){X_OFFSET1, 464, 728, 248}, timelineLeaderTitle);
+  GuiScrollPanel((Rectangle){440, 472, 656 - ScrollPanel019BoundsOffset.x,
+                             232 - ScrollPanel019BoundsOffset.y},
+                 NULL, (Rectangle){440, 472, 656, 232},
+                 &ScrollPanel019ScrollOffset, &ScrollPanel019ScrollView);
+
+  /* End of Timeline scrollpanel */
+
+  /* Timeline buttons */
+
+  if (GuiButton((Rectangle){X_OFFSET1 + 8, 480, XS, XS}, hideButtonLabel))
+    noop();
+  if (GuiButton((Rectangle){X_OFFSET1 + 8 + XS + 8, 480, XS, XS},
+                muteButtonLabel))
+    noop();
+  if (GuiButton((Rectangle){X_OFFSET1 + 8, 504, LG, XS}, setButtonLabel))
+    noop();
+
+  if (GuiButton((Rectangle){X_OFFSET1 + 8, 536, XS, XS}, hideButtonLabel))
+    noop();
+  if (GuiButton((Rectangle){X_OFFSET1 + 8 + XS + 8, 536, XS, XS},
+                muteButtonLabel))
+    noop();
+  if (GuiButton((Rectangle){X_OFFSET1 + 8, 560, LG, XS}, setButtonLabel))
+    noop();
+
+  if (GuiButton((Rectangle){X_OFFSET1 + 8, 592, XS, XS}, hideButtonLabel))
+    noop();
+  if (GuiButton((Rectangle){X_OFFSET1 + 8 + XS + 8, 592, XS, XS},
+                muteButtonLabel))
+    noop();
+  if (GuiButton((Rectangle){X_OFFSET1 + 8, 616, LG, XS}, setButtonLabel))
+    noop();
+
+  if (GuiButton((Rectangle){X_OFFSET1 + 8, 648, XS, XS}, hideButtonLabel))
+    noop();
+  if (GuiButton((Rectangle){X_OFFSET1 + 8 + XS + 8, 648, XS, XS},
+                muteButtonLabel))
+    noop();
+  if (GuiButton((Rectangle){X_OFFSET1 + 8, 672, LG, XS}, setButtonLabel))
+    noop();
+
+  /* End of Timeline buttons */
+
   GuiInput();
 }
 
