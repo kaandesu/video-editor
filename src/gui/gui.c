@@ -1,5 +1,6 @@
 #include "gui.h"
 #include "file_dialog.h"
+#include "media_control.h"
 #include "media_pool.h"
 #include "menu_bar.h"
 #include "raygui.h"
@@ -18,6 +19,9 @@ void GuiSetup(void) {
 void DrawGui(void) {
   /* Media Pool */
   DrawMediaPoolWindow(mpw);
+
+  /* Media Control */
+  DrawMediaControl();
 
   /* Timeline */
   DrawTimeline();
