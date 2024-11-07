@@ -24,6 +24,7 @@ add_executable(video_editor
   src/gui/menu_bar.c
   src/gui/timeline.c
   src/gui/media_pool.c
+  src/gui/media_control.c
 )
 
 if(APPLE)

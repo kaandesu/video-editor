@@ -119,7 +119,6 @@ void DrawFileDialog(FileDialog *fd) {
             TraceLog(LOG_WARNING, TextFormat("not supported extension: %s",
                                              fd->fileList.paths[i]));
             df->active = false;
-            UnloadDroppedFiles(LoadDroppedFiles());
             return;
           }
           fd->shouldSavePaths = true;
@@ -138,7 +137,6 @@ void UnloadFileDialog(FileDialog *fd) {
   if (fd == NULL)
     return;
 
-  UnloadDroppedFiles(fd->fileList);
   if (fd->dragField != NULL) {
     free(fd->dragField);
     fd->dragField = NULL;

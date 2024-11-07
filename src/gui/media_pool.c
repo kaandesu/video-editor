@@ -54,6 +54,7 @@ void DrawMediaPoolWindow(MediaPoolWindow *mpw) {
   if (ShouldSavePaths(mpw->fd)) {
     UpdateMediaPoolPaths(mpw);
     savedPathsToPool(mpw->fd);
+    UnloadDroppedFiles(GetFilePathList(mpw->fd));
   }
 
   for (int i = 0; i < mpw->count; i++) {
