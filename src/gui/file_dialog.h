@@ -10,5 +10,8 @@ FileDialog *LoadFileDialog(Rectangle rect, const char *label,
 
 void DrawFileDialog(FileDialog *);
 void UnloadFileDialog(FileDialog *);
+FilePathList GetFilePathList(FileDialog *fd);
+bool ShouldSavePaths(FileDialog *fd);
+void savedPathsToPool(FileDialog *fd);
 
 #endif

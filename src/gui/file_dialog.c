@@ -26,8 +26,11 @@ typedef struct file_dialog {
   bool clicked;
   bool hovered;
   bool once;
+  bool shouldSavePaths;
   FilePathList fileList;
 } FileDialog;
+
+void savedPathsToPool(FileDialog *fd) { fd->shouldSavePaths = false; }
 
 FileDialog *LoadFileDialog(Rectangle rect, const char *label,
                            const char *wTitle, char *wDesc, Vector2 pos) {
@@ -39,6 +42,8 @@ FileDialog *LoadFileDialog(Rectangle rect, const char *label,
 
   fd->rectangle = rect;
   fd->once = false;
+  fd->shouldSavePaths = false;
+
   snprintf(fd->label, sizeof(fd->label), "%s", label);
   snprintf(fd->displayLabel, sizeof(fd->label), "%s", label);
 
@@ -108,24 +113,32 @@ void DrawFileDialog(FileDialog *fd) {
     } else {
       TraceLog(LOG_INFO, "loading the dropped files");
       fd->fileList = LoadDroppedFiles();
-      if (fd->fileList.count == 1) {
-        if (!IsFileExtension(fd->fileList.paths[0], ".mpg")) {
-          TraceLog(LOG_WARNING, TextFormat("not supported extension: %s",
-                                           fd->fileList.paths[0]));
-          return;
+      if (fd->fileList.count >= 1) {
+        for (int i = 0; i < fd->fileList.count; i++) {
+          if (!IsFileExtension(fd->fileList.paths[i], ".mpg")) {
+            TraceLog(LOG_WARNING, TextFormat("not supported extension: %s",
+                                             fd->fileList.paths[i]));
+            df->active = false;
+            UnloadDroppedFiles(LoadDroppedFiles());
+            return;
+          }
+          fd->shouldSavePaths = true;
         }
         LoadVideo(fd->fileList.paths[0]);
-        UnloadDroppedFiles(fd->fileList);
         df->active = false;
       }
     }
   }
 }
 
+FilePathList GetFilePathList(FileDialog *fd) { return fd->fileList; }
+bool ShouldSavePaths(FileDialog *fd) { return fd->shouldSavePaths; }
+
 void UnloadFileDialog(FileDialog *fd) {
   if (fd == NULL)
     return;
 
+  UnloadDroppedFiles(fd->fileList);
   if (fd->dragField != NULL) {
     free(fd->dragField);
     fd->dragField = NULL;
