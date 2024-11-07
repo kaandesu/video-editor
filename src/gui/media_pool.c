@@ -2,35 +2,40 @@
 #include "file_dialog.h"
 #include "raylib.h"
 #include "style.h"
-#include "video.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
-#define X_OFFSET 376
-
 #define MediaPoolTitle "Media"
-#define MediaPLayerTitle "Media Player"
 
 #define boxWidth 100
 #define boxHeight 35
-
-const char *playText = ICON_PLAYER_PLAY;
-const char *currentTimeLabel = "00:00:00/00:00:00";
 
 Rectangle scrollView = {0, 0, 0, 0};
 Vector2 mediaSourcesAreaOffset = {0, 0};
 Vector2 panelScroll = {0, 0};
 Rectangle panelView = {0};
 
+// TODO: add icon based on type
+// remove button
+// info button
+// open in finder for mac?
+typedef struct MediaFile {
+  enum MediaType type;
+  Color color;
+  char label[50];
+  char *path;
+} MediaFile;
+
 typedef struct media_pool_window {
   FileDialog *fd;
   int count;
-  char **pathList;
+  MediaFile *MediaFiles;
 } MediaPoolWindow;
 
 void UpdateMediaPoolPaths(MediaPoolWindow *mpw);
+static void setupDebug(MediaPoolWindow *mpw);
 
 static void noop(void) {}
 
@@ -61,21 +66,13 @@ void DrawMediaPoolWindow(MediaPoolWindow *mpw) {
     float x = (panelRec.x + panelScroll.x + 12) * ((i % 2 != 0) + 1);
     float y = panelRec.y + panelScroll.y +
               ((i - (i % 2 != 0)) * (boxHeight + XXS) / 2.0f + XXS);
-    DrawRectangle(x, y, boxWidth, boxHeight, Fade(DARKGRAY, .9f));
-    DrawText(mpw->pathList[i], x + 5, y + 2, 10, WHITE);
+    DrawRectangle(x, y, boxWidth, boxHeight,
+                  Fade(mpw->MediaFiles[i].color, .9f));
+    DrawText(mpw->MediaFiles[i].label, x + 5, y + 2, 10, WHITE);
   }
   EndScissorMode();
-  /* End Content */
 
   DrawFileDialog(mpw->fd);
-
-  // TODO: move the media player below to its own file
-  GuiGroupBox((Rectangle){X_OFFSET, 72, 544, 360}, MediaPLayerTitle);
-  if (GuiButton((Rectangle){600, 392, MD, SM}, playText))
-    RestartVideo();
-  if (GuiButton((Rectangle){664, 392, MD, SM}, ICON_RESTART))
-    RestartVideo();
-  GuiLabel((Rectangle){392, 392, 128, 24}, currentTimeLabel);
 }
 
 MediaPoolWindow *LoadMediaPoolWindow(FileDialog *fd) {
@@ -85,6 +82,7 @@ MediaPoolWindow *LoadMediaPoolWindow(FileDialog *fd) {
     exit(EXIT_FAILURE);
   }
   mpw->fd = fd;
+  setupDebug(mpw);
 
   return mpw;
 }
@@ -100,16 +98,16 @@ void UnloadMediaPoolWindow(MediaPoolWindow *mpw) {
 }
 
 void UpdateMediaPoolPaths(MediaPoolWindow *mpw) {
-  int list1_size = GetFilePathList(mpw->fd).count;
+  int filesCount = GetFilePathList(mpw->fd).count;
 
-  mpw->pathList =
-      realloc(mpw->pathList, (mpw->count + list1_size) * sizeof(char *));
-  if (mpw->pathList == NULL) {
-    TraceLog(LOG_ERROR, "Failed to realloc pathList");
+  mpw->MediaFiles =
+      realloc(mpw->MediaFiles, (mpw->count + filesCount) * sizeof(MediaFile));
+  if (mpw->MediaFiles == NULL) {
+    TraceLog(LOG_ERROR, "Failed to realloc MediaFiles");
     exit(EXIT_FAILURE);
   }
 
-  for (int i = 0; i < list1_size; i++) {
+  for (int i = 0; i < filesCount; i++) {
     char *fullPath = GetFilePathList(mpw->fd).paths[i];
     char *pathCopy = strdup(fullPath);
     if (pathCopy == NULL) {
@@ -124,15 +122,42 @@ void UpdateMediaPoolPaths(MediaPoolWindow *mpw) {
       token = strtok(NULL, "/");
     }
 
-    mpw->pathList[mpw->count + i] = strdup(fileName);
-    if (mpw->pathList[mpw->count + i] == NULL) {
-      TraceLog(LOG_ERROR, "Failed to store file name in pathList");
+    mpw->MediaFiles[mpw->count + i].path = strdup(fullPath);
+    if (mpw->MediaFiles[mpw->count + i].path == NULL) {
+      TraceLog(LOG_ERROR, "Failed to store path in MediaFile");
       exit(EXIT_FAILURE);
     }
 
-    printf("Loaded media: %s\n", mpw->pathList[mpw->count + i]);
+    mpw->MediaFiles[mpw->count + i].color = DARKGRAY;
+    strncpy(mpw->MediaFiles[mpw->count + i].label, fileName,
+            sizeof(mpw->MediaFiles[mpw->count + i].label) - 1);
+    mpw->MediaFiles[mpw->count + i]
+        .label[sizeof(mpw->MediaFiles[mpw->count + i].label) - 1] = '\0';
+
+    printf("Loaded media: %s\n", mpw->MediaFiles[mpw->count + i].label);
     free(pathCopy);
   }
 
-  mpw->count += list1_size;
+  mpw->count += filesCount;
+}
+
+static void setupDebug(MediaPoolWindow *mpw) {
+  mpw->MediaFiles = malloc(sizeof(MediaFile));
+  if (mpw->MediaFiles == NULL) {
+    fprintf(stderr, "Failed to allocate memory for MediaFiles\n");
+    exit(EXIT_FAILURE);
+  }
+
+  mpw->MediaFiles[0].path = strdup("./resources/test.mpg");
+  if (mpw->MediaFiles[0].path == NULL) {
+    fprintf(stderr, "Failed to allocate memory for default path\n");
+    exit(EXIT_FAILURE);
+  }
+
+  mpw->MediaFiles[0].color = DARKGRAY;
+  strncpy(mpw->MediaFiles[0].label, "test.mpg",
+          sizeof(mpw->MediaFiles[0].label) - 1);
+  mpw->MediaFiles[0].label[sizeof(mpw->MediaFiles[0].label) - 1] = '\0';
+
+  mpw->count = 1;
 }
