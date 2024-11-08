@@ -19,7 +19,7 @@
 int main(void) {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "kaan's video editor");
   GuiLoadStyleCyber();
-  SetTargetFPS(60);
+
   SetExitKey(KEY_ESCAPE);
 
   GuiSetup();
@@ -33,6 +33,7 @@ int main(void) {
 
     DrawVideo();
     DrawGui();
+    DrawFPS(15, GetScreenHeight() - 30);
 
     EndDrawing();
   }
