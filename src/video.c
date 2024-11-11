@@ -30,6 +30,10 @@ static bool gotDims = false;
 static bool loop = false;
 static uint8_t buffer[BUFFER_SIZE];
 static size_t size;
+static FILE *ffmpeg = NULL;
+static bool ffmpegStarted = false;
+
+void InitRecording();
 
 void LoadVideo(const char *filename) {
   UpdateFilePath(filename);
@@ -84,32 +88,30 @@ void RenderVideo(void) {
           img.data = (unsigned char *)malloc(img.width * img.height * 3);
 
           texture = LoadTextureFromImage(img);
+          renderTexture = LoadRenderTexture(texture.width, texture.height);
           UnloadImage(img);
         }
 
         UpdateTexture(texture, info->display_fbuf->buf[0]);
+        if (ffmpegStarted) {
+          fwrite(LoadImageFromTexture(renderTexture.texture).data, 1,
+                 texture.width * texture.height * sizeof(uint32_t), ffmpeg);
+        }
         frameCount++;
-        BeginTextureMode(renderTexture);
-        DrawTexturePro(texture, (Rectangle){0, 0, texture.width, texture.width},
-                       (Rectangle){332.0f, 100, 400, 300}, (Vector2){0, 0}, 0,
-                       WHITE);
-        EndTextureMode();
       }
       break;
     default:
       break;
     }
   }
+  BeginTextureMode(renderTexture);
+  DrawTexturePro(texture, (Rectangle){0, 0, texture.width, texture.height},
+                 (Rectangle){0, 0, texture.width, texture.height},
+                 (Vector2){0, 0}, 0, WHITE);
+  EndTextureMode();
 }
 
 int getCurrentFrameCount() { return frameCount; }
-
-void renderVideo(void) {
-  BeginTextureMode(renderTexture);
-  DrawTexturePro(texture, (Rectangle){0, 0, texture.width, texture.width},
-                 (Rectangle){332.0f, 100, 300, 200}, (Vector2){0, 0}, 0, WHITE);
-  EndTextureMode();
-}
 
 void DrawVideo(void) {
   if (!videoLoaded)
@@ -126,6 +128,7 @@ void UnloadVideo(void) {
   if (videoFile != NULL) {
     fclose(videoFile);
   }
+  StopRecording();
 }
 
 void RestartVideo(void) {
@@ -150,5 +153,35 @@ void UpdateFilePath(const char *filename) {
   } else {
     TraceLog(LOG_ERROR, "Memory allocation failed [UpdateFilePath]\n");
     exit(EXIT_FAILURE);
+  }
+}
+
+void StartRecording() {
+  if (videoFile == NULL) {
+    TraceLog(LOG_WARNING, "Video file not found, not starting the recording");
+    return;
+  }
+
+  if (!ffmpegStarted) {
+    TraceLog(LOG_INFO, "FFMPEG OPEN");
+    ffmpeg = popen(
+        "ffmpeg -loglevel verbose -y -f rawvideo -pix_fmt rgba -s 1280x720 "
+        "-r 30 -i - -vf \"vflip\" -c:v libx264 -pix_fmt yuv420p output.mp4",
+        "w");
+
+    if (!ffmpeg) {
+      TraceLog(LOG_ERROR, "Could not open FFmpeg pipe");
+      exit(EXIT_FAILURE);
+    }
+    ffmpegStarted = true;
+  }
+}
+
+void StopRecording() {
+  if (ffmpeg != NULL) {
+    TraceLog(LOG_INFO, "Closing the ffmpeg process");
+    ffmpegStarted = false;
+    pclose(ffmpeg);
+    ffmpeg = NULL;
   }
 }

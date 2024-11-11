@@ -9,6 +9,9 @@
 
 #define MediaPoolTitle "Media"
 
+#define VIDEO_DEFAULT_COL DARKGRAY
+#define AUDIO_DEFAULT_COL GRAY
+
 #define boxWidth 100
 #define boxHeight 35
 
@@ -128,7 +131,7 @@ void UpdateMediaPoolPaths(MediaPoolWindow *mpw) {
       exit(EXIT_FAILURE);
     }
 
-    mpw->MediaFiles[mpw->count + i].color = DARKGRAY;
+    mpw->MediaFiles[mpw->count + i].color = VIDEO_DEFAULT_COL;
     strncpy(mpw->MediaFiles[mpw->count + i].label, fileName,
             sizeof(mpw->MediaFiles[mpw->count + i].label) - 1);
     mpw->MediaFiles[mpw->count + i]
@@ -154,7 +157,7 @@ static void setupDebug(MediaPoolWindow *mpw) {
     exit(EXIT_FAILURE);
   }
 
-  mpw->MediaFiles[0].color = DARKGRAY;
+  mpw->MediaFiles[0].color = VIDEO_DEFAULT_COL;
   strncpy(mpw->MediaFiles[0].label, "test.mpg",
           sizeof(mpw->MediaFiles[0].label) - 1);
   mpw->MediaFiles[0].label[sizeof(mpw->MediaFiles[0].label) - 1] = '\0';

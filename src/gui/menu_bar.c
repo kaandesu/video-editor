@@ -2,13 +2,23 @@
 #include "raygui.h"
 #include "raylib.h"
 #include "style.h"
+#include "video.h"
 #include <stdlib.h>
+
+bool recording = false;
 
 static void noop(void) {}
 void newLayout(void) {}
 void loadLayout(void) {}
 void downloadLayout(void) {}
-void exportVideo(void) {}
+void exportVideo(void) {
+  recording = !recording;
+  if (recording) {
+    StartRecording();
+  } else {
+    StopRecording();
+  }
+}
 void undoBtn(void) {}
 void redoBtn(void) {}
 void donateDialogBtn(void) {}
