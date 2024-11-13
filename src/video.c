@@ -32,6 +32,9 @@ static uint8_t buffer[BUFFER_SIZE];
 static size_t size;
 static FILE *ffmpeg = NULL;
 static bool ffmpegStarted = false;
+static float period = 1;
+static float currentPeriod = 1;
+static int currentFPS = 60;
 
 void InitRecording();
 
@@ -56,52 +59,62 @@ void LoadVideo(const char *filename) {
 void RenderVideo(void) {
   if (!videoLoaded)
     return;
+
+  if ((currentFPS = GetFPS()) <= 0) {
+    currentFPS = 60;
+  }
   lastFrame = frameCount;
-  while (lastFrame == frameCount && !paused) {
-    state = mpeg2_parse(decoder);
-    switch (state) {
-    case STATE_BUFFER:
-      size = fread(buffer, 1, BUFFER_SIZE, videoFile);
-      mpeg2_buffer(decoder, buffer, buffer + BUFFER_SIZE);
-      if (size == 0) {
-        if (loop == true) {
-          RestartVideo();
-        } else {
-          paused = true;
+  currentPeriod += period;
+  if (currentPeriod > 1) {
+    currentPeriod = 0;
+
+    while (lastFrame == frameCount && !paused) {
+      state = mpeg2_parse(decoder);
+      switch (state) {
+      case STATE_BUFFER:
+        size = fread(buffer, 1, BUFFER_SIZE, videoFile);
+        mpeg2_buffer(decoder, buffer, buffer + BUFFER_SIZE);
+        if (size == 0) {
+          if (loop == true) {
+            RestartVideo();
+          } else {
+            paused = true;
+          }
         }
+        break;
+      case STATE_SEQUENCE:
+        mpeg2_convert(decoder, mpeg2convert_rgb24, NULL);
+        break;
+      case STATE_INVALID_END:
+      case STATE_END:
+      case STATE_SLICE:
+        if (info->display_fbuf) {
+          if (gotDims == false) {
+            gotDims = true;
+
+            img.width = info->sequence->width;
+            img.height = info->sequence->height;
+            img.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8;
+            img.mipmaps = 1;
+            img.data = (unsigned char *)malloc(img.width * img.height * 3);
+
+            texture = LoadTextureFromImage(img);
+            renderTexture = LoadRenderTexture(texture.width, texture.height);
+            UnloadImage(img);
+          }
+          period = (27000000.0f / (info->sequence->frame_period) /
+                    (float)currentFPS);
+          UpdateTexture(texture, info->display_fbuf->buf[0]);
+          if (ffmpegStarted) {
+            fwrite(LoadImageFromTexture(renderTexture.texture).data, 1,
+                   texture.width * texture.height * sizeof(uint32_t), ffmpeg);
+          }
+          frameCount++;
+        }
+        break;
+      default:
+        break;
       }
-      break;
-    case STATE_SEQUENCE:
-      mpeg2_convert(decoder, mpeg2convert_rgb24, NULL);
-      break;
-    case STATE_INVALID_END:
-    case STATE_END:
-    case STATE_SLICE:
-      if (info->display_fbuf) {
-        if (gotDims == false) {
-          gotDims = true;
-
-          img.width = info->sequence->width;
-          img.height = info->sequence->height;
-          img.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8;
-          img.mipmaps = 1;
-          img.data = (unsigned char *)malloc(img.width * img.height * 3);
-
-          texture = LoadTextureFromImage(img);
-          renderTexture = LoadRenderTexture(texture.width, texture.height);
-          UnloadImage(img);
-        }
-
-        UpdateTexture(texture, info->display_fbuf->buf[0]);
-        if (ffmpegStarted) {
-          fwrite(LoadImageFromTexture(renderTexture.texture).data, 1,
-                 texture.width * texture.height * sizeof(uint32_t), ffmpeg);
-        }
-        frameCount++;
-      }
-      break;
-    default:
-      break;
     }
   }
   BeginTextureMode(renderTexture);
