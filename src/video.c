@@ -9,8 +9,8 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <mpeg2dec/mpeg2.h>
-#include <mpeg2dec/mpeg2convert.h>
+#include <mpeg2.h>
+#include <mpeg2convert.h>
 
 #define BUFFER_SIZE 4096
 
@@ -54,15 +54,21 @@ void LoadVideo(const char *filename) {
 
   info = mpeg2_info(decoder);
   videoLoaded = true;
+  period = 1;
+  currentPeriod = 1;
+  frameCount = 0;
 }
 
 void RenderVideo(void) {
   if (!videoLoaded)
     return;
 
-  if ((currentFPS = GetFPS()) <= 0) {
+  if (GetFPS() <= 0) {
     currentFPS = 60;
+  } else {
+    currentFPS = GetFPS();
   }
+
   lastFrame = frameCount;
   currentPeriod += period;
   if (currentPeriod > 1) {
@@ -102,8 +108,10 @@ void RenderVideo(void) {
             renderTexture = LoadRenderTexture(texture.width, texture.height);
             UnloadImage(img);
           }
-          period = (27000000.0f / (info->sequence->frame_period) /
-                    (float)currentFPS);
+          period = (27000000.0f / info->sequence->frame_period) / currentFPS;
+
+          TraceLog(LOG_INFO, "frame lmaooo %f",
+                   (27000000.0f / info->sequence->frame_period));
           UpdateTexture(texture, info->display_fbuf->buf[0]);
           if (ffmpegStarted) {
             fwrite(LoadImageFromTexture(renderTexture.texture).data, 1,

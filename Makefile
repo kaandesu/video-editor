@@ -3,7 +3,7 @@ BUILD_DIR = build
 
 all: clean build run
 
-build:
+build: clean
 	mkdir -p $(BUILD_DIR)
 	cd $(BUILD_DIR) && cmake ..
 	cd $(BUILD_DIR) && make
