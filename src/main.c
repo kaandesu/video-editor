@@ -8,7 +8,7 @@
 #include "raygui.h"
 
 #include "gui.h"
-#include "style_cyber.h"
+#include "style_amber.h"
 #include "video.h"
 
 #include "input.h"
@@ -18,7 +18,7 @@
 
 int main(void) {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "kaan's video editor");
-  GuiLoadStyleCyber();
+  GuiLoadStyleAmber();
 
   SetExitKey(KEY_ESCAPE);
 

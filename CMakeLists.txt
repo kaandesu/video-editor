@@ -9,7 +9,7 @@ set(RAYLIB_DIR ${pwd}/lib/raylib)
 set(MPEG2_DIR ${pwd}/lib/libmpeg2)
 set(src ${pwd}/src)
 set(gui ${src}/gui)
-set(style ${pwd}/styles/cyber)
+set(style ${pwd}/styles/amber)
 
 include_directories(
     ${RAYLIB_DIR}/include
